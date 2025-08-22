@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hw2/fruit_image.dart';
 import 'package:hw2/product.dart';
-import 'package:hw2/fruit_image.dart';
+import 'package:provider/provider.dart';
+import 'cartModel.dart';
 
 class CartList extends StatefulWidget {
-  final List<Product> cartList;
-  const CartList({super.key, required this.cartList});
-
+  const CartList({super.key});
   @override
   State<CartList> createState() => _CartListState();
 }
@@ -17,6 +16,8 @@ class _CartListState extends State<CartList> {
 
   @override
   Widget build(BuildContext context) {
+    final cart = context.watch<cartModel>();
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -26,18 +27,30 @@ class _CartListState extends State<CartList> {
         ),
       ),
       body: ListView.builder(
-        itemCount: widget.cartList.length,
+        itemCount: cart.items.length,
         itemBuilder: (context, index) {
-          final Product product = widget.cartList[index];
+          final Product product = cart.items[index];
           return ListTile(
             title: Text(product.title),
             subtitle: Text('${product.price}원'),
             leading: Image.asset(
               furit_image_path.return_image_path(product.title),
             ),
-            trailing: Icon(Icons.remove),
+            trailing: IconButton(
+              onPressed: () {
+                context.read<cartModel>().removeFromCart(product);
+              },
+              icon: Icon(Icons.remove),
+            ),
           );
         },
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Text(
+          '총 합계: ${cart.totalPrice}원',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }

@@ -3,9 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:hw2/ProductDetailPage.dart';
+import 'package:hw2/cartModel.dart';
 import 'package:hw2/fruit_image.dart';
 import 'package:hw2/product.dart';
 import 'package:hw2/cart_list.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,12 +18,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+    return ChangeNotifierProvider(
+      create: (context) => cartModel(),
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        ),
+        home: ProductListPage(),
       ),
-      home: ProductListPage(),
     );
   }
 }
@@ -36,6 +41,7 @@ class ProductListPage extends StatefulWidget {
 class _ProductListPageState extends State<ProductListPage> {
   final List<Product> _list = [
     Product(
+      id: 0,
       title: 'Apple',
       summary: 'Fresh red apple',
       price: 1200,
@@ -43,6 +49,7 @@ class _ProductListPageState extends State<ProductListPage> {
       color: Colors.red,
     ),
     Product(
+      id: 1,
       title: 'Banana',
       summary: 'Sweet banana',
       price: 800,
@@ -50,6 +57,7 @@ class _ProductListPageState extends State<ProductListPage> {
       color: Colors.yellow,
     ),
     Product(
+      id: 2,
       title: 'Orange',
       summary: 'Citrus orange',
       price: 1500,
@@ -57,6 +65,7 @@ class _ProductListPageState extends State<ProductListPage> {
       color: Colors.orange,
     ),
     Product(
+      id: 3,
       title: 'Grapes',
       summary: 'Seedless grapes',
       price: 2000,
@@ -64,6 +73,7 @@ class _ProductListPageState extends State<ProductListPage> {
       color: Colors.purple,
     ),
     Product(
+      id: 4,
       title: 'Watermelon',
       summary: 'Large watermelon',
       price: 5000,
@@ -71,6 +81,7 @@ class _ProductListPageState extends State<ProductListPage> {
       color: Colors.green,
     ),
     Product(
+      id: 5,
       title: 'Strawberry',
       summary: 'Fresh strawberry',
       price: 2500,
@@ -78,6 +89,7 @@ class _ProductListPageState extends State<ProductListPage> {
       color: Colors.pink,
     ),
     Product(
+      id: 6,
       title: 'Peach',
       summary: 'Soft peach',
       price: 1800,
@@ -85,6 +97,7 @@ class _ProductListPageState extends State<ProductListPage> {
       color: Colors.yellow,
     ),
     Product(
+      id: 7,
       title: 'Mango',
       summary: 'Tropical mango',
       price: 3000,
@@ -92,6 +105,7 @@ class _ProductListPageState extends State<ProductListPage> {
       color: Colors.amber,
     ),
     Product(
+      id: 8,
       title: 'Blueberry',
       summary: 'Healthy blueberry',
       price: 3500,
@@ -99,6 +113,7 @@ class _ProductListPageState extends State<ProductListPage> {
       color: Colors.blue,
     ),
     Product(
+      id: 9,
       title: 'Pineapple',
       summary: 'Juicy pineapple',
       price: 4000,
@@ -109,26 +124,19 @@ class _ProductListPageState extends State<ProductListPage> {
   String fruit_name = '';
 
   var image_path = fruit_image();
-  final List<Product> _cartlist = [];
-
-  void _addToCart(Product product) {
-    setState(() {
-      _cartlist.add(product);
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: Text('fruit sort page'),
+        centerTitle: true,
         actions: [
           IconButton(
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => CartList(cartList: _cartlist),
-                ),
+                MaterialPageRoute(builder: (context) => CartList()),
               );
             },
             icon: Icon(Icons.add_shopping_cart),
@@ -194,7 +202,18 @@ class _ProductListPageState extends State<ProductListPage> {
                               Text(product.price.toString()),
                               ElevatedButton(
                                 onPressed: () {
-                                  _addToCart(product);
+                                  Provider.of<cartModel>(
+                                    context,
+                                    listen: false,
+                                  ).addToCart(product);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        '장바구니에 ${product.title}이 추가 되었습니다.',
+                                      ),
+                                      duration: Duration(seconds: 1),
+                                    ),
+                                  );
                                 },
                                 child: Text('장바구니에 담기'),
                               ),
